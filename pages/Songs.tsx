@@ -1,28 +1,20 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { mockDb } from '../services/mockDb';
 import { Song, SONG_CATEGORIES } from '../types';
-import { Search, Filter, BookOpen, Edit2, Trash2, Music, ArrowUpDown, Loader2 } from 'lucide-react';
+import { Search, Filter, BookOpen, Edit2, Trash2, Music, ArrowUpDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Songs = () => {
   const { user } = useAuth();
   const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'category'>('date');
 
   const fetchSongs = async () => {
-    setLoading(true);
-    try {
-        const data = await mockDb.getSongs();
-        setSongs(data);
-    } catch (e) {
-        console.error(e);
-    } finally {
-        setLoading(false);
-    }
+    const data = await mockDb.getSongs();
+    setSongs(data);
   };
 
   useEffect(() => {
@@ -51,7 +43,6 @@ const Songs = () => {
       } else if (sortBy === 'category') {
         return a.category.localeCompare(b.category);
       } else {
-        // Date desc
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
@@ -76,7 +67,6 @@ const Songs = () => {
         )}
       </div>
 
-      {/* Filters and Sorting */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
@@ -117,64 +107,57 @@ const Songs = () => {
         </div>
       </div>
 
-      {/* Grid */}
-      {loading ? (
-        <div className="flex justify-center p-20">
-            <Loader2 className="animate-spin text-gold-500" size={40} />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSongs.map(song => (
-            <div key={song.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col group overflow-hidden">
-                <div className="p-6 flex-1">
-                <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-bold text-gold-600 bg-gold-50 px-2 py-1 rounded uppercase tracking-wider">
-                    {song.category}
-                    </span>
-                    {song.language && (
-                    <span className="text-xs text-gray-400 font-medium">{song.language}</span>
-                    )}
-                </div>
-                <h3 className="text-xl font-serif font-bold text-gray-900 mb-2 line-clamp-1">{song.title}</h3>
-                <p className="text-gray-500 text-sm line-clamp-3 font-serif italic opacity-80">
-                    "{song.lyrics.slice(0, 100)}..."
-                </p>
-                </div>
-                
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                <Link 
-                    to={`/songs/${song.id}`}
-                    className="text-gray-600 hover:text-gold-600 font-medium text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform"
-                >
-                    <BookOpen size={16} />
-                    View Lyrics
-                </Link>
-                
-                {canEdit && (
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link 
-                        to={`/songs/${song.id}/edit`}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
-                        title="Edit"
-                    >
-                        <Edit2 size={16} />
-                    </Link>
-                    <button 
-                        onClick={() => handleDelete(song.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
-                        title="Delete"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredSongs.map(song => (
+          <div key={song.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col group overflow-hidden">
+            <div className="p-6 flex-1">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-xs font-bold text-gold-600 bg-gold-50 px-2 py-1 rounded uppercase tracking-wider">
+                  {song.category}
+                </span>
+                {song.language && (
+                  <span className="text-xs text-gray-400 font-medium">{song.language}</span>
                 )}
-                </div>
+              </div>
+              <h3 className="text-xl font-serif font-bold text-gray-900 mb-2 line-clamp-1">{song.title}</h3>
+              <p className="text-gray-500 text-sm line-clamp-3 font-serif italic opacity-80">
+                "{song.lyrics.slice(0, 100)}..."
+              </p>
             </div>
-            ))}
-        </div>
-      )}
+            
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+              <Link 
+                to={`/songs/${song.id}`}
+                className="text-gray-600 hover:text-gold-600 font-medium text-sm flex items-center gap-2 group-hover:translate-x-1 transition-transform"
+              >
+                <BookOpen size={16} />
+                View Lyrics
+              </Link>
+              
+              {canEdit && (
+                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link 
+                    to={`/songs/${song.id}/edit`}
+                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+                    title="Edit"
+                  >
+                    <Edit2 size={16} />
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete(song.id)}
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
 
-      {!loading && filteredSongs.length === 0 && (
+      {filteredSongs.length === 0 && (
         <div className="text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
           <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
             <Music size={32} />

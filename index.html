@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choir II Ruvumera</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              gold: {
+                50: '#FCF9F0',
+                100: '#F7F1D6',
+                200: '#EFDFAB',
+                300: '#E6CC80',
+                400: '#DEBA5E',
+                500: '#D4AF37', // Classic Metallic Gold
+                600: '#AA8C2C',
+                700: '#806921',
+                800: '#66541A',
+                900: '#3D3210',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        /* Professional Gradient Background */
+        background-color: #fdfbf7;
+        background-image: 
+          radial-gradient(circle at 0% 0%, #fdfbf7 0%, transparent 100%),
+          radial-gradient(circle at 100% 0%, #f7f1d6 0%, transparent 50%),
+          radial-gradient(circle at 100% 100%, #fdfbf7 0%, transparent 100%),
+          radial-gradient(circle at 0% 100%, #f7f1d6 0%, transparent 50%);
+        background-attachment: fixed;
+        color: #111827; /* Gray 900 */
+      }
+      
+      /* Force inputs to be readable */
+      input, select, textarea {
+        color: #000000 !important;
+        font-weight: 500 !important;
+      }
+      
+      ::placeholder {
+        color: #6b7280 !important; /* Gray 500 */
+        opacity: 1;
+      }
+
+      .lyrics-text {
+        font-family: 'Playfair Display', serif;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.1/client",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.1",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.1",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.39.3",
+    "@google/genai": "https://esm.sh/@google/genai@0.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+  }
+}
+</script>
+</head>
+  <body>
+    <!-- Polyfill for process to prevent crashes in some libraries -->
+    <script>
+      window.process = {
+        env: {
+          NODE_ENV: 'development'
+        }
+      };
+    </script>
+    <div id="root"></div>
+  </body>
+</html>

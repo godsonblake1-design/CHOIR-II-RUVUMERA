@@ -1,13 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { mockDb } from '../services/mockDb';
-import { Download, Upload, AlertTriangle, Database, Loader2 } from 'lucide-react';
+import { Download, Upload, AlertTriangle, Database } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const [downloading, setDownloading] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -36,20 +35,17 @@ const Settings = () => {
     reader.onload = async (event) => {
       try {
         const jsonContent = event.target?.result as string;
-        if (confirm('WARNING: This will overwrite all current data in the Supabase Database (Songs, Users, Members). This action cannot be undone. Are you sure?')) {
-          setUploading(true);
+        if (confirm('WARNING: This will overwrite all current data. This action cannot be undone. Are you sure?')) {
           await mockDb.importDatabase(jsonContent);
           alert('Database restored successfully! The page will now reload.');
           window.location.reload();
         }
       } catch (error) {
-        alert('Failed to import database. Please ensure the file is valid and the server is reachable.');
+        alert('Failed to import database. Please ensure the file is valid.');
         console.error(error);
-        setUploading(false);
       }
     };
     reader.readAsText(file);
-    // Reset input
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -84,14 +80,14 @@ const Settings = () => {
             <div className="flex-1">
               <h3 className="font-medium text-gray-900 mb-1">Export Data</h3>
               <p className="text-sm text-gray-500 mb-3">
-                Download a JSON file containing all songs, users, and members from the Cloud Database.
+                Download a JSON file containing all songs, users, and members.
               </p>
               <button 
                 onClick={handleDownload}
                 disabled={downloading}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
               >
-                {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                <Download size={16} />
                 Download Backup
               </button>
             </div>
@@ -124,10 +120,9 @@ const Settings = () => {
               
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
-                {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                <Upload size={16} />
                 Upload Backup File
               </button>
             </div>

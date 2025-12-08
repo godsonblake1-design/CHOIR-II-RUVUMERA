@@ -5,9 +5,8 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  avatar?: string; // Base64 string for profile picture
   createdAt: string;
-  profileImage?: string; // Base64 string for profile picture
-  isChatSuspended?: boolean; // If true, user cannot send messages
 }
 
 export interface Song {
@@ -30,6 +29,7 @@ export interface Member {
   name: string;
   voicePart: VoicePart;
   phone?: string;
+  address?: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -39,10 +39,8 @@ export interface ChatMessage {
   userId: string;
   userName: string;
   userAvatar?: string;
-  content: string; // Text or Base64 data
-  type: 'text' | 'image' | 'file';
-  fileName?: string; // For files
-  createdAt: string;
+  content: string;
+  timestamp: string;
 }
 
 export interface AuthState {

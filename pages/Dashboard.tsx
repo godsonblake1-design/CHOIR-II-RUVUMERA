@@ -1,27 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { mockDb } from '../services/mockDb';
-import { Music, Users, Clock, Mic2, Loader2 } from 'lucide-react';
+import { Music, Users, Clock, Mic2 } from 'lucide-react';
 import { Song, User } from '../types';
 
 const Dashboard = () => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      try {
-        const [fetchedSongs, fetchedUsers] = await Promise.all([
-          mockDb.getSongs(),
-          mockDb.getUsers()
-        ]);
-        setSongs(fetchedSongs);
-        setUsers(fetchedUsers);
-      } catch (e) {
-        console.error("Error loading dashboard", e);
-      } finally {
-        setLoading(false);
-      }
+      const fetchedSongs = await mockDb.getSongs();
+      const fetchedUsers = await mockDb.getUsers();
+      setSongs(fetchedSongs);
+      setUsers(fetchedUsers);
     };
     loadData();
   }, []);
@@ -39,16 +30,13 @@ const Dashboard = () => {
     </div>
   );
 
-  const recentSongs = songs
-    .slice(0, 5); // Already sorted by DB query
-
-  if (loading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin text-gold-500" size={40} /></div>;
+  const recentSongs = songs.slice(0, 5);
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 font-serif">Dashboard</h1>
-        <p className="text-gray-500">Welcome back to Choir II Ruvumera Administration</p>
+        <p className="text-gray-600">Welcome back to Choir II Ruvumera Administration</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -105,17 +93,17 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gold-50 rounded-xl p-6 border border-gold-100">
+        <div className="bg-gradient-to-br from-gold-50 to-white rounded-xl p-6 border border-gold-100 shadow-sm">
            <h3 className="text-lg font-bold text-gold-800 mb-2 font-serif">Choir Vision</h3>
            <p className="text-gold-700 leading-relaxed italic">
              "To sing with passion, worship with truth, and bring light through our melodies."
            </p>
            <div className="mt-6 flex gap-4">
-             <div className="bg-white/60 p-4 rounded-lg flex-1">
+             <div className="bg-white p-4 rounded-lg flex-1 shadow-sm">
                <p className="text-xs font-bold text-gold-800 uppercase tracking-wide">Next Rehearsal</p>
                <p className="text-lg font-semibold text-gray-800">Friday, 6:00 PM</p>
              </div>
-             <div className="bg-white/60 p-4 rounded-lg flex-1">
+             <div className="bg-white p-4 rounded-lg flex-1 shadow-sm">
                <p className="text-xs font-bold text-gold-800 uppercase tracking-wide">Upcoming Service</p>
                <p className="text-lg font-semibold text-gray-800">Sunday, 9:00 AM</p>
              </div>
