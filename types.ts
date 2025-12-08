@@ -1,3 +1,4 @@
+
 export type Role = 'ADMIN' | 'EDITOR' | 'USER';
 
 export interface User {
@@ -34,12 +35,17 @@ export interface Member {
   createdAt: string;
 }
 
+export type MessageType = 'text' | 'image' | 'file';
+
 export interface ChatMessage {
   id: string;
   userId: string;
   userName: string;
   userAvatar?: string;
   content: string;
+  type?: MessageType;
+  mediaUrl?: string; // Base64 or URL
+  fileName?: string;
   timestamp: string;
 }
 

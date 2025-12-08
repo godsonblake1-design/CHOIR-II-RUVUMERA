@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,15 +36,10 @@
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        /* Professional Gradient Background */
-        background-color: #fdfbf7;
-        background-image: 
-          radial-gradient(circle at 0% 0%, #fdfbf7 0%, transparent 100%),
-          radial-gradient(circle at 100% 0%, #f7f1d6 0%, transparent 50%),
-          radial-gradient(circle at 100% 100%, #fdfbf7 0%, transparent 100%),
-          radial-gradient(circle at 0% 100%, #f7f1d6 0%, transparent 50%);
+        /* Premium Professional Background - Gold Dust */
+        background: radial-gradient(circle at top right, #fdfbf7 0%, #f7f1e3 40%, #eee4d1 100%);
         background-attachment: fixed;
-        color: #111827; /* Gray 900 */
+        color: #111827;
       }
       
       /* Force inputs to be readable */
@@ -59,6 +55,32 @@
 
       .lyrics-text {
         font-family: 'Playfair Display', serif;
+      }
+
+      /* Scrollbar hiding for clean UI */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-in {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+      
+      /* WhatsApp Specific Background */
+      .whatsapp-bg {
+        background-color: #efeae2;
+        background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+        background-repeat: repeat;
+        background-blend-mode: overlay;
       }
     </style>
   <script type="importmap">
@@ -78,14 +100,6 @@
 </script>
 </head>
   <body>
-    <!-- Polyfill for process to prevent crashes in some libraries -->
-    <script>
-      window.process = {
-        env: {
-          NODE_ENV: 'development'
-        }
-      };
-    </script>
     <div id="root"></div>
   </body>
 </html>
