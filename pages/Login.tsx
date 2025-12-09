@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Music, Lock, Mail } from 'lucide-react';
+import { Music, Lock, Mail, AlertTriangle } from 'lucide-react';
+import { mockDb } from '../services/mockDb';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [dbError, setDbError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if database tables exist on mount
+    mockDb.checkConnection().then(isConnected => {
+      if (!isConnected) setDbError(true);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +57,18 @@ const Login = () => {
         </div>
 
         <div className="p-8 pb-6">
+          {dbError && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded shadow-sm">
+                <div className="flex items-center gap-2 font-bold mb-1">
+                    <AlertTriangle size={18} />
+                    <span>Database Not Found</span>
+                </div>
+                <p className="text-sm">
+                    The application cannot connect to the database tables. Please copy the <strong>SQL Schema</strong> and run it in your Supabase Dashboard's SQL Editor.
+                </p>
+              </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 text-red-900 font-medium text-sm p-3 rounded-lg border border-red-200 text-center">

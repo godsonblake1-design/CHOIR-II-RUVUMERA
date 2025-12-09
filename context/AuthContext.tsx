@@ -2,7 +2,10 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, AuthState } from '../types';
 import { mockDb } from '../services/mockDb';
 
-interface AuthContextType extends AuthState {
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   registerUser: (name: string, email: string, password: string, role: string) => Promise<void>;
@@ -22,40 +25,61 @@ export const AuthProvider = ({ children }: { children?: ReactNode }) => {
   });
 
   useEffect(() => {
-    // Check if user session exists and refresh it from DB to get latest changes (like avatar)
+    let mounted = true;
+
     const initAuth = async () => {
-      const savedSession = localStorage.getItem(SESSION_KEY);
-      if (savedSession) {
-        const sessionUser = JSON.parse(savedSession);
-        try {
-          const freshUser = await mockDb.getUserById(sessionUser.id);
-          if (freshUser) {
-             const { passwordHash, ...safeUser } = freshUser;
-             setState({
-               user: safeUser,
-               isAuthenticated: true,
-               isLoading: false
-             });
-          } else {
-             // User deleted from DB
-             localStorage.removeItem(SESSION_KEY);
-             setState(prev => ({ ...prev, isLoading: false }));
-          }
-        } catch (e) {
-           setState(prev => ({ ...prev, isLoading: false }));
+      // Safety Timer: If DB takes too long, force load finished so user sees Login page
+      const safetyTimer = setTimeout(() => {
+        if (mounted && state.isLoading) {
+            console.warn("Auth initialization timed out, forcing load completion.");
+            setState(prev => ({ ...prev, isLoading: false }));
         }
-      } else {
-        setState(prev => ({ ...prev, isLoading: false }));
+      }, 3000); // 3 seconds max wait
+
+      try {
+        const savedSession = localStorage.getItem(SESSION_KEY);
+        if (savedSession) {
+          const sessionUser = JSON.parse(savedSession);
+          // Verify session against real DB
+          const freshUser = await mockDb.getUserById(sessionUser.id);
+          
+          if (mounted) {
+            if (freshUser) {
+               const { passwordHash, ...safeUser } = freshUser;
+               setState({
+                 user: safeUser,
+                 isAuthenticated: true,
+                 isLoading: false
+               });
+            } else {
+               // User deleted from DB or invalid session
+               localStorage.removeItem(SESSION_KEY);
+               setState(prev => ({ ...prev, isLoading: false }));
+            }
+          }
+        } else {
+          if (mounted) setState(prev => ({ ...prev, isLoading: false }));
+        }
+      } catch (e) {
+         console.error("Auth init error:", e);
+         if (mounted) setState(prev => ({ ...prev, isLoading: false }));
+      } finally {
+        clearTimeout(safetyTimer);
       }
     };
+
     initAuth();
+
+    return () => {
+        mounted = false;
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     const userWithPass = await mockDb.getUserByEmail(email);
 
     if (!userWithPass) {
-      throw new Error('User not found');
+      throw new Error('User not found. Please check credentials or run SQL Schema.');
     }
 
     if (userWithPass.passwordHash !== password) {

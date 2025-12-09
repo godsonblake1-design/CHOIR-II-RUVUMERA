@@ -4,16 +4,28 @@ import { User, Song, Member, DatabaseExport, ChatMessage } from '../types';
 
 class DbService {
   constructor() {
-    this.seedAdmin();
+    // Fire and forget, but catch errors to prevent crashing main thread
+    this.seedAdmin().catch(e => console.error("Init Error:", e));
+  }
+
+  // Helper to check if tables exist
+  async checkConnection(): Promise<boolean> {
+    const { error } = await supabase.from('users').select('id').limit(1);
+    // If error code is 42P01 (undefined_table), tables are missing
+    if (error && error.code === '42P01') return false;
+    // Other errors might be network, but we assume connected if not 42P01
+    return true;
   }
 
   // Check if Admin exists in Supabase, if not create it
   private async seedAdmin() {
     try {
-      const { data: users } = await supabase
+      const { data: users, error } = await supabase
         .from('users')
         .select('*')
         .eq('email', 'linox257@gmail.com');
+
+      if (error) return; // Database likely not set up yet
 
       if (!users || users.length === 0) {
         console.log('Seeding admin...');
@@ -43,7 +55,20 @@ class DbService {
   }
 
   async getUserByEmail(email: string) {
-    const { data } = await supabase.from('users').select('*').eq('email', email).maybeSingle();
+    const { data, error } = await supabase.from('users').select('*').eq('email', email).maybeSingle();
+    
+    // Auto-fix: Create admin if missing during login attempt
+    if (!data && email === 'linox257@gmail.com') {
+         console.log("Admin missing during login. Attempting to create...");
+         const adminPayload = {
+            name: 'Main Admin',
+            email: 'linox257@gmail.com',
+            role: 'ADMIN',
+            passwordHash: 'My company1'
+        };
+        const { data: newAdmin, error: createError } = await supabase.from('users').insert([adminPayload]).select().single();
+        if (!createError) return newAdmin;
+    }
     return data;
   }
 
@@ -176,9 +201,6 @@ class DbService {
   async importDatabase(jsonString: string) {
     try {
       const data: DatabaseExport = JSON.parse(jsonString);
-      
-      // Warning: This does not clear tables first to avoid foreign key constraint issues.
-      // It attempts to Upsert (Update if exists, Insert if new)
       
       if (Array.isArray(data.users) && data.users.length > 0) {
         await supabase.from('users').upsert(data.users);

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -17,8 +18,10 @@ const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode
   const { isAuthenticated, isLoading, user } = useAuth();
   
   if (isLoading) return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-gold-600 font-serif font-medium">Loading...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfbf7]">
+          <div className="w-12 h-12 border-4 border-gold-200 border-t-gold-600 rounded-full animate-spin mb-4"></div>
+          <div className="text-gold-800 font-serif font-bold text-lg">Connecting to Choir Ruvumera...</div>
+          <p className="text-xs text-gray-500 mt-2">Checking Database...</p>
       </div>
   );
   
